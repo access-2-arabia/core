@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="EmptyView">
+
+        <attr name="empty_icon" format="reference" />
+        <attr name="empty_title" format="string" />
+        <attr name="empty_message" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="SliderView">
+
+        <attr name="slider_text" format="string" />
+    </declare-styleable>
+</resources>

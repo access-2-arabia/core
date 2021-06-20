@@ -1,0 +1,116 @@
+package com.a2a.core.extensions
+
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.LinearLayout
+import androidx.appcompat.widget.SearchView
+import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+
+const val DEBOUNCE_SEARCH_DELAY = 500L
+
+inline fun SearchView.doOnDebounceQueryChange(
+    lifecycleOwner: LifecycleOwner,
+    crossinline action: (query: String?) -> Unit
+) {
+    setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+        private var searchFor = ""
+
+        override fun onQueryTextSubmit(query: String?): Boolean {
+            action(query)
+            clearFocus()
+            return false
+        }
+
+        override fun onQueryTextChange(newText: String?): Boolean {
+            val searchText = newText.toString().trim()
+            if (searchText == searchFor)
+                return true
+
+            searchFor = searchText
+
+            lifecycleOwner.lifecycleScope.launch {
+                delay(DEBOUNCE_SEARCH_DELAY)
+                if (searchText != searchFor)
+                    return@launch
+                action(newText)
+            }
+            return true
+        }
+    })
+}
+
+inline fun EditText.doOnDebounceQueryChange(
+    lifecycleOwner: LifecycleOwner,
+    crossinline action: (query: String?) -> Unit
+) {
+    var searchFor = ""
+    doOnTextChanged { text, _, _, _ ->
+        val searchText = text.toString().trim()
+        if (searchText == searchFor)
+            return@doOnTextChanged
+
+        searchFor = searchText
+
+        lifecycleOwner.lifecycleScope.launch {
+            delay(DEBOUNCE_SEARCH_DELAY)
+            if (searchText != searchFor)
+                return@launch
+            action(text?.toString())
+        }
+    }
+}
+
+fun View.screenshot(): Bitmap {
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    draw(canvas)
+    return bitmap
+}
+
+fun Int.screenshot(layoutInflater: LayoutInflater, width: Float, height: Float = width): Bitmap {
+    return toMeasuredView(layoutInflater, false, width, height).screenshot()
+}
+
+fun Int.toMeasuredView(
+    layoutInflater: LayoutInflater,
+    authSize: Boolean = false,
+    width: Float = 0f,
+    height: Float = width
+): View {
+    val parent = LinearLayout(layoutInflater.context)
+    val inflatedFrame: View = layoutInflater.inflate(this, parent, false)
+    val params: ViewGroup.LayoutParams = inflatedFrame.layoutParams
+
+    val wSpec: Int = measureSpecFromDimension(params.width, width.toInt())
+    val hSpec: Int = measureSpecFromDimension(params.height, height.toInt())
+    inflatedFrame.measure(wSpec, hSpec)
+
+
+    if (authSize) {
+        val measuredWidth = inflatedFrame.measuredWidth
+        val measuredHeight = inflatedFrame.measuredHeight
+        inflatedFrame.layout(0, 0, measuredWidth, measuredHeight)
+    } else {
+        inflatedFrame.layout(0, 0, width.toInt(), height.toInt())
+    }
+
+    return inflatedFrame
+}
+
+private fun measureSpecFromDimension(dimension: Int, maxDimension: Int): Int {
+    return when (dimension) {
+        ViewGroup.LayoutParams.MATCH_PARENT -> View.MeasureSpec.makeMeasureSpec(maxDimension, View.MeasureSpec.EXACTLY)
+        ViewGroup.LayoutParams.WRAP_CONTENT -> View.MeasureSpec.makeMeasureSpec(maxDimension, View.MeasureSpec.AT_MOST)
+        else -> View.MeasureSpec.makeMeasureSpec(dimension, View.MeasureSpec.EXACTLY)
+    }
+}
