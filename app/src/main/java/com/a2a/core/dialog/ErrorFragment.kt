@@ -7,13 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.navigation.fragment.navArgs
-import com.a2a.core.R
+ import com.a2a.core.R
 import com.a2a.core.callbacks.CommunicationListener
 import com.a2a.core.databinding.DialogErrorBinding
 import com.a2a.core.extensions.viewBinding
-import com.google.android.gms.common.ErrorDialogFragment
-import dagger.hilt.android.AndroidEntryPoint
 
 class ErrorFragment : DialogFragment() {
 
