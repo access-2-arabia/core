@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.util.Base64
 import android.view.View
 import android.widget.EditText
@@ -12,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.a2a.core.utility.SafeClickListener
+import com.scottyab.rootbeer.RootBeer
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.DateFormat
@@ -25,6 +27,11 @@ fun View.setSafeOnClickListener(onSafeClick: (View) -> Unit) {
     }
     setOnClickListener(safeClickListener)
 }
+
+
+fun checkRootDevice(context: Context): Boolean = RootBeer(context).isRooted
+
+
 fun String.isValidNumber(): Boolean {
     return this.startsWith("0096279")
             || this.startsWith("0096277")
@@ -151,11 +158,13 @@ fun String.shareText(context: Context, shareMessage: String) {
 
 
 fun String?.getLocal(ar: String?): String {
-    return if (Locale.getDefault().language == "en") this?:"" else ar?:""
+    return if (Locale.getDefault().language == "en") this ?: "" else ar ?: ""
 }
 
-fun Activity.changeStatusBarColor(color:Int){
-    window.statusBarColor = ContextCompat.getColor(this,color)
+fun Activity.changeStatusBarColor(color: Int) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        window.statusBarColor = ContextCompat.getColor(this, color)
+    }
 }
 
 fun FragmentManager.getCurrentNavigationFragment(): Fragment? =
