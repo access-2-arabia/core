@@ -10,15 +10,16 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 
 import com.a2a.core.callbacks.CommunicationListener
-import javax.inject.Inject
 
 
-class BiometricPromptUtility  @Inject constructor() : CommunicationListener {
+class BiometricPromptUtility : CommunicationListener {
     //region variable
 
     companion object {
+        var instance = BiometricPromptUtility()
         var SUCCESS = 0
         var FAILURE = 1
+
     }
 
     //endregion

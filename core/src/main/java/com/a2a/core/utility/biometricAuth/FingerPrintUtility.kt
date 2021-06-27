@@ -20,20 +20,20 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.NoSuchPaddingException
 import javax.crypto.SecretKey
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class FingerPrintUtility  @Inject constructor(private var helper:FingerprintHelper) {
+
+class FingerPrintUtility {
     //region variable
     private lateinit var cipher: Cipher
     private lateinit var fingerPrintListener: FingerPrintListener
     lateinit var keyStore: KeyStore
     lateinit var fingerprintManager: FingerprintManager
     lateinit var biometricPrompt: BiometricPrompt
+    lateinit var helper: FingerprintHelper
 
-
-
+    companion object {
+        var instance = FingerPrintUtility()
+    }
     //endregion
 
     @RequiresApi(Build.VERSION_CODES.M)
