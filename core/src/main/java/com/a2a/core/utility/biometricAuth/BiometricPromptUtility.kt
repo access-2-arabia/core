@@ -1,33 +1,36 @@
 package  com.a2a.core.utility.biometricAuth
 
 
- import android.os.Build
+import android.os.Build
 import androidx.annotation.RequiresApi
- import androidx.biometric.BiometricManager
- import androidx.biometric.BiometricPrompt
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
 
- import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 
-import androidx.navigation.fragment.findNavController
- import com.a2a.core.R
- import com.a2a.core.callbacks.CommunicationListener
+import com.a2a.core.callbacks.CommunicationListener
+import javax.inject.Inject
 
 
-class BiometricPromptUtility : CommunicationListener {
+class BiometricPromptUtility  @Inject constructor() : CommunicationListener {
     //region variable
 
     companion object {
-        var instance = BiometricPromptUtility()
+        var SUCCESS = 0
+        var FAILURE = 1
     }
+
     //endregion
     @RequiresApi(Build.VERSION_CODES.P)
-    fun prepare(context: Fragment, biometricAthListener: BiometricAthListener,
-                title:String,cancelButtonText:String) {
+    fun prepare(
+        context: Fragment, biometricAthListener: BiometricAthListener,
+        title: String, cancelButtonText: String
+    ) {
 
-        val promptInfo = createPromptInfo(title,cancelButtonText)
+        val promptInfo = createPromptInfo(title, cancelButtonText)
         val biometricPrompt = createBiometricPrompt(context, biometricAthListener)
-        execute(context, biometricPrompt, promptInfo)
+        execute(context, biometricPrompt, promptInfo, biometricAthListener)
 
     }
 
@@ -36,7 +39,8 @@ class BiometricPromptUtility : CommunicationListener {
     private fun execute(
         context: Fragment,
         biometricPrompt: BiometricPrompt,
-        promptInfo: BiometricPrompt.PromptInfo
+        promptInfo: BiometricPrompt.PromptInfo,
+        biometricAthListener: BiometricAthListener
     ) {
 
         if (BiometricManager.from(context.requireContext())
@@ -44,11 +48,7 @@ class BiometricPromptUtility : CommunicationListener {
         ) {
             biometricPrompt.authenticate(promptInfo)
         } else {
-//            val action = LoginFragmentDirections.toWarningFragment(
-//                context.getString(R.string.please_enable_biomtriec),
-//                this
-//            )
-//            context.findNavController().navigate(action)
+            biometricAthListener.onExecute(FAILURE)
         }
     }
 
@@ -72,7 +72,7 @@ class BiometricPromptUtility : CommunicationListener {
 
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
-                biometricAthListener.onExecute(0)
+                biometricAthListener.onExecute(SUCCESS)
             }
         }
 
@@ -80,7 +80,10 @@ class BiometricPromptUtility : CommunicationListener {
     }
 
 
-    private fun createPromptInfo(title:String,cancelButtonText:String): BiometricPrompt.PromptInfo {
+    private fun createPromptInfo(
+        title: String,
+        cancelButtonText: String
+    ): BiometricPrompt.PromptInfo {
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(title)
             // Authenticate without requiring the user to press a "confirm"

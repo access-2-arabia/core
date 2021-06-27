@@ -9,10 +9,11 @@ import android.os.CancellationSignal
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import  com.a2a.core.utility.biometricAuth.FingerPrintListener
+import javax.inject.Inject
 
 
 @RequiresApi(Build.VERSION_CODES.M)
-class FingerprintHelper(private val appContext: Context, private var fingerPrintListener: FingerPrintListener) :
+class FingerprintHelper  @Inject constructor (private val appContext: Context, private var fingerPrintListener: FingerPrintListener) :
     FingerprintManager.AuthenticationCallback() {
 
     private lateinit var cancellationSignal: CancellationSignal
