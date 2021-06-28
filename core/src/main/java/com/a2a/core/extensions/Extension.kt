@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Base64
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -32,6 +33,14 @@ fun View.setSafeOnClickListener(onSafeClick: (View) -> Unit) {
 fun checkRootDevice(context: Context): Boolean = RootBeer(context).isRooted
 
 
+fun EditText.showKeyboard(context: Context) {
+    requestFocus()
+    postDelayed(Runnable {
+        val inputMethodManager =
+            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+        inputMethodManager!!.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+    }, 200)
+}
 fun String.isValidNumber(): Boolean {
     return this.startsWith("0096279")
             || this.startsWith("0096277")
