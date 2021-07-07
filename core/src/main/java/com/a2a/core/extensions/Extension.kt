@@ -181,7 +181,7 @@ fun FragmentManager.getCurrentNavigationFragment(): Fragment? =
 
 
 
-fun EditText.getSting() = this.text.toString().trim()
+fun EditText.getString() = this.text.toString().trim()
 
 
 
