@@ -5,10 +5,10 @@ import androidx.databinding.BindingAdapter
 import com.a2a.core.extensions.getLocal
 
 
-@BindingAdapter("getText")
+@BindingAdapter(value = ["app:arabic","english"] ,requireAll = true)
 fun AppCompatTextView?.getText(
-    english: String,
-    arabic: String
+    arabic: String,
+    english: String
 ) {
     this?.text = english.getLocal(arabic)
 }
