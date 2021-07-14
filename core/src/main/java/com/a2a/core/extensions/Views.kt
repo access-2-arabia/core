@@ -111,15 +111,23 @@ fun Int.toMeasuredView(
 
     return inflatedFrame
 }
-private fun ImageView.load64Image(image: String, context: Context) {
+
+fun ImageView.load64Image(image: String, context: Context) {
     val decodedString = Base64.decode(image, Base64.DEFAULT)
     val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
     Glide.with(context).load(decodedByte).into(this)
 }
-private fun measureSpecFromDimension(dimension: Int, maxDimension: Int): Int {
+
+fun measureSpecFromDimension(dimension: Int, maxDimension: Int): Int {
     return when (dimension) {
-        ViewGroup.LayoutParams.MATCH_PARENT -> View.MeasureSpec.makeMeasureSpec(maxDimension, View.MeasureSpec.EXACTLY)
-        ViewGroup.LayoutParams.WRAP_CONTENT -> View.MeasureSpec.makeMeasureSpec(maxDimension, View.MeasureSpec.AT_MOST)
+        ViewGroup.LayoutParams.MATCH_PARENT -> View.MeasureSpec.makeMeasureSpec(
+            maxDimension,
+            View.MeasureSpec.EXACTLY
+        )
+        ViewGroup.LayoutParams.WRAP_CONTENT -> View.MeasureSpec.makeMeasureSpec(
+            maxDimension,
+            View.MeasureSpec.AT_MOST
+        )
         else -> View.MeasureSpec.makeMeasureSpec(dimension, View.MeasureSpec.EXACTLY)
     }
 }
