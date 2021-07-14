@@ -184,7 +184,38 @@ fun FragmentManager.getCurrentNavigationFragment(): Fragment? =
 fun EditText.getString() = this.text.toString().trim()
 
 
+fun showViews(vararg view: View) {
+    view.forEach {
+        it.visible(true)
+    }
+}
 
+fun hideViews(vararg view: View) {
+    view.forEach {
+        it.visible(false)
+    }
+}
+
+
+fun enableViews(vararg view: View) {
+    view.forEach {
+        it.enable(true)
+    }
+}
+
+fun disableViews(vararg view: View) {
+    view.forEach {
+        it.enable(false)
+    }
+}
+
+fun View.visible(isVisible: Boolean) {
+    visibility = if (isVisible) View.VISIBLE else View.GONE
+}
+
+fun View.enable(isEnable: Boolean) {
+    isEnabled = isEnable
+}
 
 
 
