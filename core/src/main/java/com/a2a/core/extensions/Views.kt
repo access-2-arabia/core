@@ -1,16 +1,21 @@
 package com.a2a.core.extensions
 
+import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.widget.SearchView
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -106,7 +111,11 @@ fun Int.toMeasuredView(
 
     return inflatedFrame
 }
-
+private fun ImageView.load64Image(image: String, context: Context) {
+    val decodedString = Base64.decode(image, Base64.DEFAULT)
+    val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+    Glide.with(context).load(decodedByte).into(this)
+}
 private fun measureSpecFromDimension(dimension: Int, maxDimension: Int): Int {
     return when (dimension) {
         ViewGroup.LayoutParams.MATCH_PARENT -> View.MeasureSpec.makeMeasureSpec(maxDimension, View.MeasureSpec.EXACTLY)
