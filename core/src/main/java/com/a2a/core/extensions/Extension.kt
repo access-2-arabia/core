@@ -13,7 +13,11 @@ import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
+import com.a2a.core.utility.OnSnapPositionChangeListener
 import com.a2a.core.utility.SafeClickListener
+import com.a2a.core.utility.SnapOnScrollListener
 import com.scottyab.rootbeer.RootBeer
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -41,6 +45,7 @@ fun EditText.showKeyboard(context: Context) {
         inputMethodManager!!.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
     }, 200)
 }
+
 fun String.isValidNumber(): Boolean {
     return this.startsWith("0096279")
             || this.startsWith("0096277")
@@ -180,7 +185,6 @@ fun FragmentManager.getCurrentNavigationFragment(): Fragment? =
     primaryNavigationFragment?.childFragmentManager?.fragments?.first()
 
 
-
 fun EditText.getString() = this.text.toString().trim()
 
 
@@ -215,6 +219,59 @@ fun View.visible(isVisible: Boolean) {
 
 fun View.enable(isEnable: Boolean) {
     isEnabled = isEnable
+}
+
+
+fun RecyclerView.attachSnapHelperWithListener(
+    snapHelper: SnapHelper,
+    behavior: SnapOnScrollListener.Behavior = SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL,
+    onSnapPositionChangeListener: OnSnapPositionChangeListener
+) {
+    onFlingListener = null
+    snapHelper.attachToRecyclerView(this)
+    val snapOnScrollListener =
+        SnapOnScrollListener(snapHelper, behavior, onSnapPositionChangeListener)
+    addOnScrollListener(snapOnScrollListener)
+}
+
+fun SnapHelper.getSnapPosition(recyclerView: RecyclerView): Int {
+    val layoutManager = recyclerView.layoutManager ?: return RecyclerView.NO_POSITION
+    val snapView = findSnapView(layoutManager) ?: return RecyclerView.NO_POSITION
+    return layoutManager.getPosition(snapView)
+}
+
+
+fun toggleSection(bt: View, lyt: View) {
+    val show = toggleArrow(bt)
+    if (show) {
+        ViewAnimation.expand(lyt, object : ViewAnimation.AnimListener {
+            override fun onFinish() {
+
+            }
+        })
+    } else {
+        ViewAnimation.collapse(lyt)
+    }
+}
+
+fun toggleArrow(view: View): Boolean {
+    return if (view.rotation == 0f) {
+        view.animate().setDuration(200).rotation(180f)
+        true
+    } else {
+        view.animate().setDuration(200).rotation(0f)
+        false
+    }
+}
+
+fun getBasicFormat(): SimpleDateFormat {
+    val basicFormat = "yyyy/MM/dd"
+    return SimpleDateFormat(basicFormat, Locale.US)
+}
+
+fun Date.toString(format: String, locale: Locale = Locale.getDefault()): String {
+    val formatter = SimpleDateFormat(format, locale)
+    return formatter.format(this)
 }
 
 
