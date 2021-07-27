@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.CancellationSignal
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
-import  com.a2a.core.utility.biometricAuth.FingerPrintListener
 
 
 @RequiresApi(Build.VERSION_CODES.M)

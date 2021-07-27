@@ -15,9 +15,9 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.bumptech.glide.Glide
 import com.a2a.core.constants.DefaultValues.DEFAULT_INT
 import com.a2a.core.constants.StringCharacters.EMPTY_STRING
+import com.bumptech.glide.Glide
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
