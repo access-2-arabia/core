@@ -5,17 +5,24 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.util.Base64
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
+import com.a2a.core.utility.OnSnapPositionChangeListener
 import com.a2a.core.constants.DataType.INTENT_IMAGE_ALL
 import com.a2a.core.constants.DataType.INTENT_TEXT_PLAIN
 import com.a2a.core.constants.StringCharacters
 import com.a2a.core.constants.StringCharacters.EMPTY_STRING
 import com.a2a.core.utility.SafeClickListener
+import com.a2a.core.utility.SnapOnScrollListener
+import com.scottyab.rootbeer.RootBeer
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.DateFormat
@@ -28,6 +35,19 @@ fun View.setSafeOnClickListener(onSafeClick: (View) -> Unit) {
         onSafeClick(it)
     }
     setOnClickListener(safeClickListener)
+}
+
+
+fun checkRootDevice(context: Context): Boolean = RootBeer(context).isRooted
+
+
+fun EditText.showKeyboard(context: Context) {
+    requestFocus()
+    postDelayed(Runnable {
+        val inputMethodManager =
+            context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+        inputMethodManager!!.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+    }, 200)
 }
 
 fun String.isValidNumber(): Boolean {
@@ -159,16 +179,103 @@ fun String?.getLocal(ar: String?): String {
 }
 
 fun Activity.changeStatusBarColor(color: Int) {
-    window.statusBarColor = ContextCompat.getColor(this, color)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        window.statusBarColor = ContextCompat.getColor(this, color)
+    }
 }
 
 fun FragmentManager.getCurrentNavigationFragment(): Fragment? =
     primaryNavigationFragment?.childFragmentManager?.fragments?.first()
 
 
+fun EditText.getString() = this.text.toString().trim()
 
 
+fun showViews(vararg view: View) {
+    view.forEach {
+        it.visible(true)
+    }
+}
 
+fun hideViews(vararg view: View) {
+    view.forEach {
+        it.visible(false)
+    }
+}
+
+
+fun enableViews(vararg view: View) {
+    view.forEach {
+        it.enable(true)
+    }
+}
+
+fun disableViews(vararg view: View) {
+    view.forEach {
+        it.enable(false)
+    }
+}
+
+fun View.visible(isVisible: Boolean) {
+    visibility = if (isVisible) View.VISIBLE else View.GONE
+}
+
+fun View.enable(isEnable: Boolean) {
+    isEnabled = isEnable
+}
+
+
+fun RecyclerView.attachSnapHelperWithListener(
+    snapHelper: SnapHelper,
+    behavior: SnapOnScrollListener.Behavior = SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL,
+    onSnapPositionChangeListener: OnSnapPositionChangeListener
+) {
+    onFlingListener = null
+    snapHelper.attachToRecyclerView(this)
+    val snapOnScrollListener =
+        SnapOnScrollListener(snapHelper, behavior, onSnapPositionChangeListener)
+    addOnScrollListener(snapOnScrollListener)
+}
+
+fun SnapHelper.getSnapPosition(recyclerView: RecyclerView): Int {
+    val layoutManager = recyclerView.layoutManager ?: return RecyclerView.NO_POSITION
+    val snapView = findSnapView(layoutManager) ?: return RecyclerView.NO_POSITION
+    return layoutManager.getPosition(snapView)
+}
+
+
+fun toggleSection(bt: View, lyt: View) {
+    val show = toggleArrow(bt)
+    if (show) {
+        ViewAnimation.expand(lyt, object : ViewAnimation.AnimListener {
+            override fun onFinish() {
+
+            }
+        })
+    } else {
+        ViewAnimation.collapse(lyt)
+    }
+}
+
+fun toggleArrow(view: View): Boolean {
+    return if (view.rotation == 0f) {
+        view.animate().setDuration(200).rotation(180f)
+        true
+    } else {
+        view.animate().setDuration(200).rotation(0f)
+        false
+    }
+}
+
+fun getBasicFormat(): SimpleDateFormat {
+    val basicFormat = "yyyy/MM/dd"
+    return SimpleDateFormat(basicFormat, Locale.US)
+}
+
+fun Date.toString(format: String, locale: Locale = Locale.getDefault()): String {
+    val formatter = SimpleDateFormat(format, locale)
+    return formatter.format(this)
+}
 
 
 
