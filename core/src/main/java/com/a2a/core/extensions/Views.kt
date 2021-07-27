@@ -11,6 +11,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.a2a.core.constants.DefaultValues.DEFAULT_INT
+import com.a2a.core.constants.StringCharacters.EMPTY_STRING
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -23,7 +25,7 @@ inline fun SearchView.doOnDebounceQueryChange(
 ) {
     setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
-        private var searchFor = ""
+        private var searchFor = EMPTY_STRING
 
         override fun onQueryTextSubmit(query: String?): Boolean {
             action(query)
@@ -53,7 +55,7 @@ inline fun EditText.doOnDebounceQueryChange(
     lifecycleOwner: LifecycleOwner,
     crossinline action: (query: String?) -> Unit
 ) {
-    var searchFor = ""
+    var searchFor = EMPTY_STRING
     doOnTextChanged { text, _, _, _ ->
         val searchText = text.toString().trim()
         if (searchText == searchFor)
@@ -99,9 +101,9 @@ fun Int.toMeasuredView(
     if (authSize) {
         val measuredWidth = inflatedFrame.measuredWidth
         val measuredHeight = inflatedFrame.measuredHeight
-        inflatedFrame.layout(0, 0, measuredWidth, measuredHeight)
+        inflatedFrame.layout(DEFAULT_INT, DEFAULT_INT, measuredWidth, measuredHeight)
     } else {
-        inflatedFrame.layout(0, 0, width.toInt(), height.toInt())
+        inflatedFrame.layout(DEFAULT_INT, DEFAULT_INT, width.toInt(), height.toInt())
     }
 
     return inflatedFrame

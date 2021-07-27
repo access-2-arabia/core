@@ -16,12 +16,7 @@ fun Fragment.intentTo(addressableActivity: AddressableActivity): Intent {
 }
 
 interface AddressableActivity {
-
     val action: String
-}
-fun Fragment.navigateAction(@IdRes id: Int, bundle: Bundle? = null) {
-    bundle?.let { findNavController().navigate(id, it) }
-        ?: run { findNavController().navigate(id) }
 }
 
 

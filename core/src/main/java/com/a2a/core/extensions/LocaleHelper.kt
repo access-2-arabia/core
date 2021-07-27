@@ -11,6 +11,7 @@ import java.util.*
 
 object LocaleHelper {
     private const val SELECTED_LANGUAGE = "Locale.Helper.Selected.Language"
+
     fun onAttach(context: Context): Context {
         val lang =
             getPersistedData(context, getLanguage(context)!!)

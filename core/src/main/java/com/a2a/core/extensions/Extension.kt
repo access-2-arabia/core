@@ -11,6 +11,10 @@ import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.a2a.core.constants.DataType.INTENT_IMAGE_ALL
+import com.a2a.core.constants.DataType.INTENT_TEXT_PLAIN
+import com.a2a.core.constants.StringCharacters
+import com.a2a.core.constants.StringCharacters.EMPTY_STRING
 import com.a2a.core.utility.SafeClickListener
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -25,6 +29,7 @@ fun View.setSafeOnClickListener(onSafeClick: (View) -> Unit) {
     }
     setOnClickListener(safeClickListener)
 }
+
 fun String.isValidNumber(): Boolean {
     return this.startsWith("0096279")
             || this.startsWith("0096277")
@@ -68,7 +73,7 @@ fun String.mobileFormatWithoutCode(): String {
 }
 
 fun String.notZero(): Boolean {
-    if (this == "." || this == "," || isNullOrEmpty())
+    if (this == StringCharacters.FULL_STOP || this == StringCharacters.COMMA || isNullOrEmpty())
         return false
 
     val double = this.toDouble()
@@ -90,7 +95,7 @@ fun String.formatDate(): String {
     } catch (e: ParseException) {
         e.printStackTrace()
     }
-    return ""
+    return EMPTY_STRING
 }
 
 fun File.convertToBase64(): String {
@@ -105,17 +110,16 @@ fun File.convertToBase64(): String {
 
 
     val byteArrayImage: ByteArray = baos.toByteArray()
-    var result = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
+    val result = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
     return result
 
 }
-
 
 fun shareQRImage(bitmap: Bitmap, context: Context) {
     val intent = Intent(Intent.ACTION_SEND)
     intent.putExtra(Intent.EXTRA_STREAM, bitmap)
     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    intent.type = "image/*"
+    intent.type = INTENT_IMAGE_ALL
     context.startActivity(intent)
 }
 
@@ -131,7 +135,7 @@ fun String.isValidIban(): Boolean {
     return swapped.toCharArray()
         .map { it.toInt() }
         .fold(0) { previousMod: Int, _char: Int ->
-            val value = Integer.parseInt(Character.toString(_char.toChar()), 36)
+            val value = Integer.parseInt(_char.toChar().toString(), 36)
             val factor = if (value < 10) 10 else 100
             (factor * previousMod + value) % 97
         } == 1
@@ -144,18 +148,18 @@ fun String.shareText(context: Context, shareMessage: String) {
         Intent.EXTRA_TEXT,
         shareMessage
     )
-    sendIntent.type = "text/plain"
+    sendIntent.type = INTENT_TEXT_PLAIN
     val shareIntent = Intent.createChooser(sendIntent, null)
     context.startActivity(shareIntent)
 }
 
 
 fun String?.getLocal(ar: String?): String {
-    return if (Locale.getDefault().language == "en") this?:"" else ar?:""
+    return if (Locale.getDefault().language == "en") this ?: EMPTY_STRING else ar ?: EMPTY_STRING
 }
 
-fun Activity.changeStatusBarColor(color:Int){
-    window.statusBarColor = ContextCompat.getColor(this,color)
+fun Activity.changeStatusBarColor(color: Int) {
+    window.statusBarColor = ContextCompat.getColor(this, color)
 }
 
 fun FragmentManager.getCurrentNavigationFragment(): Fragment? =

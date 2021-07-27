@@ -18,6 +18,7 @@ fun <T : ViewBinding> Fragment.viewBinding(
     viewBindingFactory: (View) -> T,
     cleanUp: ((T?) -> Unit)? = null,
 ) = FragmentViewBindingDelegate(this, viewBindingFactory, cleanUp)
+
 fun <T : ViewBinding> DialogFragment.viewBinding(
     viewBindingFactory: (View) -> T,
     cleanUp: ((T?) -> Unit)? = null,
