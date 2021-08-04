@@ -1,6 +1,9 @@
 package com.a2a.core.extensions
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -10,6 +13,8 @@ import android.util.Base64
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -41,6 +46,7 @@ fun EditText.showKeyboard(context: Context) {
         inputMethodManager!!.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
     }, 200)
 }
+
 fun String.isValidNumber(): Boolean {
     return this.startsWith("0096279")
             || this.startsWith("0096277")
@@ -126,6 +132,8 @@ fun File.convertToBase64(): String {
 
 }
 
+fun String.convertToBoolean(): Boolean = this == "1"
+fun Boolean.convertToString(): String = if (this) "1" else "0"
 
 fun shareQRImage(bitmap: Bitmap, context: Context) {
     val intent = Intent(Intent.ACTION_SEND)
@@ -180,7 +188,6 @@ fun FragmentManager.getCurrentNavigationFragment(): Fragment? =
     primaryNavigationFragment?.childFragmentManager?.fragments?.first()
 
 
-
 fun EditText.getString() = this.text.toString().trim()
 
 
@@ -217,6 +224,98 @@ fun View.enable(isEnable: Boolean) {
     isEnabled = isEnable
 }
 
+fun String.copyText(context: Context, successMessage: String) {
+    val myClipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val myClip: ClipData = ClipData.newPlainText("Label", this)
+    Toast.makeText(context, successMessage, Toast.LENGTH_SHORT).show()
+    myClipboard.setPrimaryClip(myClip)
+}
+
+fun String.stringToDate(): Date {
+    return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH).parse(this) ?: Date()
+}
+
+fun String.stringToDateyyymmdd(): Date {
+    return SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH).parse(this) ?: Date()
+}
+
+fun String.stringToTime(): Date {
+    return SimpleDateFormat("HH:mm:ss.SSS", Locale.ENGLISH).parse(this) ?: Date()
+}
+
+fun String.getDoubleFromString(): Double {
+    var convertedNumber = this
+    if (this.contains(","))
+        convertedNumber = this.replace(",", "")
+    return convertedNumber.toDouble()
+}
+
+//29/01/2019
+fun String.formatToDefaults(): String {
+    val sdf = SimpleDateFormat("MM-dd-yyyy", Locale.ENGLISH)
+    return sdf.format(this)
+}
+
+@SuppressLint("SetTextI18n")
+fun TextView.formatAmount(value: String) {
+    if (value.isNotEmpty()) {
+        var convertedNumber = value
+        if (value.contains(","))
+            convertedNumber = value.replace(",", "")
+        text = String.format(
+            "%,.3f",
+            convertedNumber.toDouble()
+        ) + " " + Constants.Currency.currency.getLocal(Constants.Currency.currencyAr)
+    }
+}
+
+@SuppressLint("SetTextI18n")
+fun TextView.formatAmountWithCurrency(value: String, currency: String) {
+    if (value.isNotEmpty()) {
+        var convertedNumber = value
+        if (value.contains(","))
+            convertedNumber = value.replace(",", "")
+        text = String.format(
+            "%,.3f",
+            convertedNumber.toDouble()
+        ) + " " + currency
+    }
+}
+
+@SuppressLint("SetTextI18n")
+fun TextView.formatDecimalWithPercentage(value: Double) {
+    text = String.format("%,.3f", value) + "%"
+}
+
+@SuppressLint("SetTextI18n")
+fun TextView.formatAmount(value: String, currency: String) {
+    var foundCurrency = false
+    var convertedNumber = value
+    if (value.contains(","))
+        convertedNumber = value.replace(",", "")
+    if (currencyFormatList.isEmpty().not() && currency.isNotEmpty()) {
+        currencyFormatList.forEach {
+            if (it.iSOCode == currency) {
+                foundCurrency = true
+                val df = truncateTo(convertedNumber.toDouble(), it.cED.toInt())
+                this.text = "$df $currency"
+            }
+        }
+    } else {
+        this.text = String.format(
+            "%,.3f",
+            convertedNumber.toDouble()
+        ) + " " + currency
+    }
+    if (foundCurrency.not())
+        this.text = String.format("%,.3f", convertedNumber.toDouble()) + " " + currency
+}
+
+fun truncateTo(unroundedNumber: Double, decimalPlaces: Int): Double {
+    val truncatedNumberInt =
+        (unroundedNumber * 10.0.pow(decimalPlaces.toDouble())).toInt()
+    return (truncatedNumberInt / 10.0.pow(decimalPlaces.toDouble()))
+}
 
 
 
