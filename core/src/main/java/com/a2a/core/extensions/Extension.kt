@@ -18,7 +18,11 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
+import com.a2a.core.utility.OnSnapPositionChangeListener
 import com.a2a.core.utility.SafeClickListener
+import com.a2a.core.utility.SnapOnScrollListener
 import com.scottyab.rootbeer.RootBeer
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -26,6 +30,7 @@ import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.pow
 
 fun View.setSafeOnClickListener(onSafeClick: (View) -> Unit) {
     val safeClickListener = SafeClickListener {
@@ -256,18 +261,18 @@ fun String.formatToDefaults(): String {
     return sdf.format(this)
 }
 
-@SuppressLint("SetTextI18n")
-fun TextView.formatAmount(value: String) {
-    if (value.isNotEmpty()) {
-        var convertedNumber = value
-        if (value.contains(","))
-            convertedNumber = value.replace(",", "")
-        text = String.format(
-            "%,.3f",
-            convertedNumber.toDouble()
-        ) + " " + Constants.Currency.currency.getLocal(Constants.Currency.currencyAr)
-    }
-}
+//@SuppressLint("SetTextI18n")
+//fun TextView.formatAmount(value: String) {
+//    if (value.isNotEmpty()) {
+//        var convertedNumber = value
+//        if (value.contains(","))
+//            convertedNumber = value.replace(",", "")
+//        text = String.format(
+//            "%,.3f",
+//            convertedNumber.toDouble()
+//        ) + " " + Constants.Currency.currency.getLocal(Constants.Currency.currencyAr)
+//    }
+//}
 
 @SuppressLint("SetTextI18n")
 fun TextView.formatAmountWithCurrency(value: String, currency: String) {
@@ -287,35 +292,88 @@ fun TextView.formatDecimalWithPercentage(value: Double) {
     text = String.format("%,.3f", value) + "%"
 }
 
-@SuppressLint("SetTextI18n")
-fun TextView.formatAmount(value: String, currency: String) {
-    var foundCurrency = false
-    var convertedNumber = value
-    if (value.contains(","))
-        convertedNumber = value.replace(",", "")
-    if (currencyFormatList.isEmpty().not() && currency.isNotEmpty()) {
-        currencyFormatList.forEach {
-            if (it.iSOCode == currency) {
-                foundCurrency = true
-                val df = truncateTo(convertedNumber.toDouble(), it.cED.toInt())
-                this.text = "$df $currency"
-            }
-        }
-    } else {
-        this.text = String.format(
-            "%,.3f",
-            convertedNumber.toDouble()
-        ) + " " + currency
-    }
-    if (foundCurrency.not())
-        this.text = String.format("%,.3f", convertedNumber.toDouble()) + " " + currency
-}
+//@SuppressLint("SetTextI18n")
+//fun TextView.formatAmount(value: String, currency: String) {
+//    var foundCurrency = false
+//    var convertedNumber = value
+//    if (value.contains(","))
+//        convertedNumber = value.replace(",", "")
+//    if (currencyFormatList.isEmpty().not() && currency.isNotEmpty()) {
+//        currencyFormatList.forEach {
+//            if (it.iSOCode == currency) {
+//                foundCurrency = true
+//                val df = truncateTo(convertedNumber.toDouble(), it.cED.toInt())
+//                this.text = "$df $currency"
+//            }
+//        }
+//    } else {
+//        this.text = String.format(
+//            "%,.3f",
+//            convertedNumber.toDouble()
+//        ) + " " + currency
+//    }
+//    if (foundCurrency.not())
+//        this.text = String.format("%,.3f", convertedNumber.toDouble()) + " " + currency
+//}
 
 fun truncateTo(unroundedNumber: Double, decimalPlaces: Int): Double {
     val truncatedNumberInt =
         (unroundedNumber * 10.0.pow(decimalPlaces.toDouble())).toInt()
     return (truncatedNumberInt / 10.0.pow(decimalPlaces.toDouble()))
 }
+
+fun RecyclerView.attachSnapHelperWithListener(
+    snapHelper: SnapHelper,
+    behavior: SnapOnScrollListener.Behavior = SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL,
+    onSnapPositionChangeListener: OnSnapPositionChangeListener
+) {
+    onFlingListener = null
+    snapHelper.attachToRecyclerView(this)
+    val snapOnScrollListener =
+        SnapOnScrollListener(snapHelper, behavior, onSnapPositionChangeListener)
+    addOnScrollListener(snapOnScrollListener)
+}
+
+fun SnapHelper.getSnapPosition(recyclerView: RecyclerView): Int {
+    val layoutManager = recyclerView.layoutManager ?: return RecyclerView.NO_POSITION
+    val snapView = findSnapView(layoutManager) ?: return RecyclerView.NO_POSITION
+    return layoutManager.getPosition(snapView)
+}
+
+
+fun toggleSection(bt: View, lyt: View) {
+    val show = toggleArrow(bt)
+    if (show) {
+        ViewAnimation.expand(lyt, object : ViewAnimation.AnimListener {
+            override fun onFinish() {
+
+            }
+        })
+    } else {
+        ViewAnimation.collapse(lyt)
+    }
+}
+
+fun toggleArrow(view: View): Boolean {
+    return if (view.rotation == 0f) {
+        view.animate().setDuration(200).rotation(180f)
+        true
+    } else {
+        view.animate().setDuration(200).rotation(0f)
+        false
+    }
+}
+
+fun getBasicFormat(): SimpleDateFormat {
+    val basicFormat = "yyyy/MM/dd"
+    return SimpleDateFormat(basicFormat, Locale.US)
+}
+
+fun Date.toString(format: String, locale: Locale = Locale.getDefault()): String {
+    val formatter = SimpleDateFormat(format, locale)
+    return formatter.format(this)
+}
+
 
 
 
