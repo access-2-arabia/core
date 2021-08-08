@@ -415,4 +415,12 @@ fun Fragment.callNumber(number: String) {
 
 }
 
+fun Fragment.sendEmail(email: String) {
+    val intent = Intent(Intent.ACTION_SEND)
+    intent.type = "plain/text"
+
+    intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("Info@ealb.com"))
+    startActivity(Intent.createChooser(intent, ""))
+}
+
 
