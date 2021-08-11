@@ -437,14 +437,14 @@ fun Fragment.sendEmail(email: String) {
     startActivity(Intent.createChooser(intent, ""))
 }
 
-fun adjustFontScale(configuration: Configuration,context: Context) {
+fun Activity.adjustFontScale(configuration: Configuration) {
     configuration.fontScale = 1.0.toFloat()
-    val metrics: DisplayMetrics = context.getResources().displayMetrics
+    val metrics: DisplayMetrics = resources.displayMetrics
     val wm: WindowManager =
-        context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-    wm.getDefaultDisplay().getMetrics(metrics)
+        getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    wm.defaultDisplay.getMetrics(metrics)
     metrics.scaledDensity = configuration.fontScale * metrics.density
-    context.resources.updateConfiguration(configuration, metrics)
+    resources.updateConfiguration(configuration, metrics)
 }
 
 
