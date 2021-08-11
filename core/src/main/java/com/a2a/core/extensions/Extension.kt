@@ -8,12 +8,15 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.util.Base64
+import android.util.DisplayMetrics
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
@@ -432,6 +435,16 @@ fun Fragment.sendEmail(email: String) {
 
     intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
     startActivity(Intent.createChooser(intent, ""))
+}
+
+fun adjustFontScale(configuration: Configuration,context: Context) {
+    configuration.fontScale = 1.0.toFloat()
+    val metrics: DisplayMetrics = context.getResources().displayMetrics
+    val wm: WindowManager =
+        context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    wm.getDefaultDisplay().getMetrics(metrics)
+    metrics.scaledDensity = configuration.fontScale * metrics.density
+    context.resources.updateConfiguration(configuration, metrics)
 }
 
 
