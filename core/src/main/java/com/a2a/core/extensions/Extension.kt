@@ -11,8 +11,13 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.location.Address
+import android.location.Geocoder
+import android.location.Location
+import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
+import android.os.Looper
 import android.util.Base64
 import android.util.DisplayMetrics
 import android.view.View
@@ -21,21 +26,32 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import com.a2a.core.utility.*
+import com.google.android.gms.location.*
 import com.scottyab.rootbeer.RootBeer
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.IOException
+import java.net.InetAddress
+import java.net.NetworkInterface
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.pow
+
+private lateinit var fusedLocationClient: FusedLocationProviderClient
+val locationEvent = MutableLiveData<LocationEvent>()
+var addresses: List<Address>? = null
+var geocoder: Geocoder? = null
 
 fun View.setSafeOnClickListener(onSafeClick: (View) -> Unit) {
     val safeClickListener = SafeClickListener {
@@ -445,6 +461,118 @@ fun Activity.adjustFontScale(configuration: Configuration) {
     wm.defaultDisplay.getMetrics(metrics)
     metrics.scaledDensity = configuration.fontScale * metrics.density
     resources.updateConfiguration(configuration, metrics)
+}
+
+
+sealed class LocationEvent {
+    object ShouldEnableGPS : LocationEvent()
+    data class GotIpAddress(val ipAddress: String) : LocationEvent()
+}
+
+
+@RequiresApi(Build.VERSION_CODES.M)
+fun Activity.getLocation() {
+    if (ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        requestPermissions(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ), 200
+        );
+        return
+    }
+    if (locationEnabled()) {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
+            val location: Location? = task.result
+            if (location != null) {
+                geocoder = Geocoder(this)
+                try {
+                    if (geocoder != null) {
+                        addresses =
+                            geocoder!!.getFromLocation(
+                                location.latitude,
+                                location.longitude,
+                                10
+                            )
+                        val address = (addresses as MutableList<Address>?)?.get(0)
+                        locationEvent.value =
+                            LocationEvent.GotIpAddress("${getIPAddress()}#${address?.countryCode}")
+                    } else {
+                    }
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            } else {
+                requestNewLocationData()
+            }
+        }
+    } else locationEvent.value = LocationEvent.ShouldEnableGPS
+}
+
+fun Activity.locationEnabled(): Boolean {
+    val locationManager: LocationManager =
+        getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+        LocationManager.NETWORK_PROVIDER
+    )
+}
+
+@RequiresApi(Build.VERSION_CODES.M)
+fun Activity.requestNewLocationData() {
+    val locationRequest = LocationRequest()
+    locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+    locationRequest.interval = 0
+    locationRequest.fastestInterval = 0
+    locationRequest.numUpdates = 1
+    fusedLocationClient =
+        LocationServices.getFusedLocationProviderClient(this)
+    if (ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        return
+    }
+    fusedLocationClient.requestLocationUpdates(
+        locationRequest, mLocationCallback,
+        Looper.myLooper()
+    )
+    getLocation()
+}
+
+var mLocationCallback = object : LocationCallback() {
+    override fun onLocationResult(locationResult: LocationResult) {
+    }
+}
+
+private fun getIPAddress(): String? {
+    try {
+        val interfaces: List<NetworkInterface> =
+            Collections.list(NetworkInterface.getNetworkInterfaces())
+        for (intf in interfaces) {
+            val addrs: List<InetAddress> = Collections.list(intf.inetAddresses)
+            for (addr in addrs) {
+                if (!addr.isLoopbackAddress) {
+                    val sAddr: String = addr.hostAddress
+                    val isIPv4 = sAddr.indexOf(':') < 0
+                    if (isIPv4) return sAddr
+                }
+            }
+        }
+    } catch (ignored: Exception) {
+    }
+    return ""
 }
 
 
