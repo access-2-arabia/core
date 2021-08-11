@@ -24,9 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
-import com.a2a.core.utility.OnSnapPositionChangeListener
-import com.a2a.core.utility.SafeClickListener
-import com.a2a.core.utility.SnapOnScrollListener
+import com.a2a.core.utility.*
 import com.scottyab.rootbeer.RootBeer
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -329,12 +327,25 @@ fun truncateTo(unroundedNumber: Double, decimalPlaces: Int): Double {
 fun RecyclerView.attachSnapHelperWithListener(
     snapHelper: SnapHelper,
     behavior: SnapOnScrollListener.Behavior = SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL,
-    onSnapPositionChangeListener: OnSnapPositionChangeListener
+    onSnapPositionChangeListener: OnSnapPositionChangeListener,
 ) {
     onFlingListener = null
     snapHelper.attachToRecyclerView(this)
     val snapOnScrollListener =
         SnapOnScrollListener(snapHelper, behavior, onSnapPositionChangeListener)
+    addOnScrollListener(snapOnScrollListener)
+}
+
+
+fun RecyclerView.attachSnapHelperToAccountWithListener(
+    snapHelper: SnapHelper,
+    behavior: SnapOnScrollToAccountListener.Behavior = SnapOnScrollToAccountListener.Behavior.NOTIFY_ON_SCROLL,
+    onSnapPositionChangeListener: OnSnapPositionChangeToAccountListener,
+) {
+    onFlingListener = null
+    snapHelper.attachToRecyclerView(this)
+    val snapOnScrollListener =
+        SnapOnScrollToAccountListener(snapHelper, behavior, onSnapPositionChangeListener)
     addOnScrollListener(snapOnScrollListener)
 }
 
