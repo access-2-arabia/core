@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.StyleRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.SearchView
@@ -20,7 +21,6 @@ import androidx.lifecycle.lifecycleScope
 import com.a2a.core.constants.DateTime
 import com.a2a.core.constants.DefaultValues.DEBOUNCE_SEARCH_DELAY
 import com.a2a.core.constants.DefaultValues.DEFAULT_INT
-import com.a2a.core.constants.StringCharacters
 import com.a2a.core.constants.StringCharacters.EMPTY_STRING
 import com.a2a.core.ui.date.DateTimeDialog
 import com.a2a.core.ui.date.DateTimeLimitation
@@ -166,12 +166,13 @@ fun AutoCompleteTextView.setListAsString(
 fun AppCompatEditText.showDateTimeDialog(
     fragment: FragmentActivity,
     type: DialogType,
-    data: String = StringCharacters.EMPTY_STRING,
+    @StyleRes style: Int = 0,
+    data: String = EMPTY_STRING,
     dateLimit: DateTimeLimitation = DateTimeLimitation.NONE
 ) {
     if (data.isNotEmpty()) setText(data)
     setOnClickListener {
-        DateTimeDialog(fragment, type, data, dateLimit) {
+        DateTimeDialog(fragment, type, data, dateLimit, style = style) {
             setTextFromCalender(it, type)
         }
     }
