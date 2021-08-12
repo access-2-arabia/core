@@ -4,8 +4,9 @@ package com.a2a.core.ui.date
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
+import androidx.annotation.StyleRes
+import com.a2a.core.extensions.isZero
 import com.a2a.core.extensions.toCalendarDate
-
 import java.util.*
 
 class DateTimeDialog(
@@ -13,6 +14,7 @@ class DateTimeDialog(
     type: DialogType,
     private val data: String,
     dateLimit: DateTimeLimitation,
+    @StyleRes private val style: Int = 0,
     var listener: (calendar: Calendar) -> Unit
 ) {
     private val calendar = Calendar.getInstance()
@@ -40,25 +42,30 @@ class DateTimeDialog(
         }
 
 
-        val datePickerDialog = DatePickerDialog(context, { _, year, monthOfYear, dayOfMonth ->
+        val dateListener = DatePickerDialog.OnDateSetListener { _, year, month, day ->
             listener.invoke(Calendar.getInstance().apply {
                 set(Calendar.YEAR, year)
-                set(Calendar.MONTH, monthOfYear)
-                set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                set(Calendar.MONTH, month)
+                set(Calendar.DAY_OF_MONTH, day)
             })
-        }, years, month, day)
+        }
+
+        val dialog = if (style.isZero()) DatePickerDialog(context, dateListener, years, month, day)
+        else DatePickerDialog(context, style, dateListener, years, month, day)
+
+
         when (dateLimit) {
-            DateTimeLimitation.CURRENT -> datePickerDialog.datePicker.minDate =
+            DateTimeLimitation.CURRENT -> dialog.datePicker.minDate =
                 System.currentTimeMillis() - 1000
             DateTimeLimitation.ADULT_18 -> {
                 val calendar = Calendar.getInstance()
                 calendar.add(Calendar.YEAR, -18)
-                datePickerDialog.datePicker.maxDate = calendar.timeInMillis
+                dialog.datePicker.maxDate = calendar.timeInMillis
             }
             DateTimeLimitation.NONE -> Unit
         }
 
-        datePickerDialog.show()
+        dialog.show()
     }
 
     private fun createTimeDialog() {
