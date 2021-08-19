@@ -575,4 +575,12 @@ private fun getIPAddress(): String? {
     return ""
 }
 
+fun Date.getFormatDaysAgo(daysAgo: Int): String {
+    val calendar = Calendar.getInstance()
+    calendar.add(Calendar.DAY_OF_YEAR, -daysAgo)
+    val dateFormat: DateFormat =
+        SimpleDateFormat("dd-mm-yyyy", Locale.US)
+    return dateFormat.format(calendar.time).toString()
+}
+
 
