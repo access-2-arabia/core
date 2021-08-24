@@ -40,14 +40,10 @@ import com.google.android.gms.location.*
 import com.scottyab.rootbeer.RootBeer
 import java.io.ByteArrayOutputStream
 import java.io.File
-<<<<<<< HEAD
 import java.io.FileOutputStream
-import java.io.IOException
-=======
 import java.io.IOException
 import java.net.InetAddress
 import java.net.NetworkInterface
->>>>>>> 32a6427f9b04597df88737de0d53c68c45501244
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -590,7 +586,7 @@ fun Date.getFormatDaysAgo(daysAgo: Int): String {
 }
 
 
- fun Fragment.saveImage(finalBitmap: Bitmap) {
+fun Fragment.saveImage(finalBitmap: Bitmap) {
     try {
         val cachePath = File(requireContext().cacheDir, "images")
         cachePath.mkdirs()
@@ -603,7 +599,7 @@ fun Date.getFormatDaysAgo(daysAgo: Int): String {
     }
 }
 
- fun Fragment.shareImage() {
+fun Fragment.shareImage() {
     val imagePath = File(requireContext().cacheDir, "images")
     val newFile = File(imagePath, "image.png")
     val contentUri =
