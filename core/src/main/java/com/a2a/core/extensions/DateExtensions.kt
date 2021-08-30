@@ -125,7 +125,6 @@ fun Date.formatToDayName(): String {
 }
 
 
-
 fun Date.formatToViewDateDefaults(): String {
     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
     return sdf.format(this)
@@ -141,6 +140,7 @@ fun Date.formatDayMonth(): String {
     val sdf = SimpleDateFormat("dd MMM", Locale.getDefault())
     return sdf.format(this)
 }
+
 
 fun Date.formatSacendToMinet(): String {
 
@@ -197,7 +197,7 @@ fun Date.formatToViewDayDefaults(): String {
 
     val sdf = SimpleDateFormat("dd", Locale.ENGLISH)
     return sdf.format(this)
- }
+}
 
 
 fun String.formatTime(): String {
@@ -222,6 +222,11 @@ fun String.formatDateAndTime(): String {
         e.printStackTrace()
     }
     return ""
+}
+
+fun String.formatCardDate(): String {
+    val sdf = SimpleDateFormat("MM/yy", Locale.getDefault())
+    return sdf.format(this)
 }
 
 
