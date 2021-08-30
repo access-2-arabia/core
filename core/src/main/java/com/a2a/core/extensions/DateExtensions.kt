@@ -224,9 +224,28 @@ fun String.formatDateAndTime(): String {
     return ""
 }
 
-fun String.formatCardDate(): String {
-    val sdf = SimpleDateFormat("MM/yy", Locale.getDefault())
-    return sdf.format(this)
+fun String.formatDayYearDate(): String {
+    val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.US)
+    val dateParse: DateFormat = SimpleDateFormat("dd/yy", Locale.US)
+    try {
+        val dte = dateFormat.parse(this)
+        return dateParse.format(dte)
+    } catch (e: ParseException) {
+        e.printStackTrace()
+    }
+    return ""
+}
+
+fun String.formatToTimeZoneDayYearDate(): String {
+    val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss", Locale.US)
+    val dateParse: DateFormat = SimpleDateFormat("dd/yy", Locale.US)
+    try {
+        val dte = dateFormat.parse(this)
+        return dateParse.format(dte.time)
+    } catch (e: ParseException) {
+        e.printStackTrace()
+    }
+    return ""
 }
 
 
