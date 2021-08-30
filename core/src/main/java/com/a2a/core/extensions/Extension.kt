@@ -29,6 +29,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.MutableLiveData
@@ -39,6 +40,7 @@ import com.google.android.gms.location.*
 import com.scottyab.rootbeer.RootBeer
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.net.InetAddress
 import java.net.NetworkInterface
@@ -584,3 +586,34 @@ fun Date.getFormatDaysAgo(daysAgo: Int): String {
 }
 
 
+fun Fragment.saveImage(finalBitmap: Bitmap) {
+    try {
+        val cachePath = File(requireContext().cacheDir, "images")
+        cachePath.mkdirs()
+        val stream =
+            FileOutputStream("$cachePath/image.png")
+        finalBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        stream.close()
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
+}
+
+fun Fragment.shareImage() {
+    val imagePath = File(requireContext().cacheDir, "images")
+    val newFile = File(imagePath, "image.png")
+    val contentUri =
+        FileProvider.getUriForFile(
+            requireContext(),
+            "com.a2a.cabsignature",
+            newFile
+        )
+    if (contentUri != null) {
+        val shareIntent = Intent()
+        shareIntent.action = Intent.ACTION_SEND
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        shareIntent.setDataAndType(contentUri, activity?.contentResolver?.getType(contentUri))
+        shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
+        startActivity(Intent.createChooser(shareIntent, "Choose an app"))
+    }
+}
