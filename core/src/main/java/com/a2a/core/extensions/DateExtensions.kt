@@ -226,7 +226,7 @@ fun String.formatDateAndTime(): String {
 
 fun String.formatDayYearDate(): String {
     val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.US)
-    val dateParse: DateFormat = SimpleDateFormat("dd/yy", Locale.US)
+    val dateParse: DateFormat = SimpleDateFormat("MM/yy", Locale.US)
     try {
         val dte = dateFormat.parse(this)
         return dateParse.format(dte)
@@ -238,7 +238,7 @@ fun String.formatDayYearDate(): String {
 
 fun String.formatToTimeZoneDayYearDate(): String {
     val dateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss", Locale.US)
-    val dateParse: DateFormat = SimpleDateFormat("dd/yy", Locale.US)
+    val dateParse: DateFormat = SimpleDateFormat("MM/yy", Locale.US)
     try {
         val dte = dateFormat.parse(this)
         return dateParse.format(dte.time)
