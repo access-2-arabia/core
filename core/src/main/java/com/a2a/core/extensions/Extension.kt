@@ -35,15 +35,10 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
-import com.a2a.core.utility.*
-import com.google.android.gms.location.*
-import com.a2a.core.constants.DataType.INTENT_IMAGE_ALL
-import com.a2a.core.constants.DataType.INTENT_TEXT_PLAIN
 import com.a2a.core.constants.StringCharacters
 import com.a2a.core.constants.StringCharacters.EMPTY_STRING
-import com.a2a.core.utility.OnSnapPositionChangeListener
-import com.a2a.core.utility.SafeClickListener
-import com.a2a.core.utility.SnapOnScrollListener
+import com.a2a.core.utility.*
+import com.google.android.gms.location.*
 import com.scottyab.rootbeer.RootBeer
 import java.io.ByteArrayOutputStream
 import java.io.File
