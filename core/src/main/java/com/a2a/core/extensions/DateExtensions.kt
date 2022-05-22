@@ -3,6 +3,7 @@ package com.a2a.core.extensions
 import android.app.DatePickerDialog
 import android.content.Context
 import android.widget.TextView
+import com.a2a.core.constants.DateTime
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -10,7 +11,7 @@ import java.util.*
 
 
 fun Date.formatToServerDateTimeDefaults(): String {
-    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    val sdf = SimpleDateFormat(DateTime.FORMAT_TO_SERVER_DATE_TIME, Locale.getDefault())
     return sdf.format(this)
 }
 
@@ -38,7 +39,7 @@ fun Date.formatToTruncatedDateTime(): String {
 
 
 fun Date.formatToServerDateDefaults(): String {
-    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val sdf = SimpleDateFormat(DateTime.FORMAT_TO_SERVER_DATE, Locale.getDefault())
     return sdf.format(this)
 }
 
@@ -49,7 +50,7 @@ fun Date.formatDayMonthYearServerDateDefaults(): String {
 
 
 fun Date.formatToServerTimeDefaults(): String {
-    val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+    val sdf = SimpleDateFormat(DateTime.FORMAT_TO_SERVER_TIME, Locale.getDefault())
     return sdf.format(this)
 }
 

@@ -37,6 +37,13 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SnapHelper
 import com.a2a.core.utility.*
 import com.google.android.gms.location.*
+import com.a2a.core.constants.DataType.INTENT_IMAGE_ALL
+import com.a2a.core.constants.DataType.INTENT_TEXT_PLAIN
+import com.a2a.core.constants.StringCharacters
+import com.a2a.core.constants.StringCharacters.EMPTY_STRING
+import com.a2a.core.utility.OnSnapPositionChangeListener
+import com.a2a.core.utility.SafeClickListener
+import com.a2a.core.utility.SnapOnScrollListener
 import com.scottyab.rootbeer.RootBeer
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -118,7 +125,7 @@ fun String.mobileFormatWithoutCode(): String {
 }
 
 fun String.notZero(): Boolean {
-    if (this == "." || this == "," || isNullOrEmpty())
+    if (this == StringCharacters.FULL_STOP || this == StringCharacters.COMMA || isNullOrEmpty())
         return false
 
     val double = this.toDouble()
@@ -140,7 +147,7 @@ fun String.formatDate(): String {
     } catch (e: ParseException) {
         e.printStackTrace()
     }
-    return ""
+    return EMPTY_STRING
 }
 
 fun File.convertToBase64(): String {
@@ -155,7 +162,7 @@ fun File.convertToBase64(): String {
 
 
     val byteArrayImage: ByteArray = baos.toByteArray()
-    var result = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
+    val result = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
     return result
 
 }
@@ -183,7 +190,7 @@ fun String.isValidIban(): Boolean {
     return swapped.toCharArray()
         .map { it.toInt() }
         .fold(0) { previousMod: Int, _char: Int ->
-            val value = Integer.parseInt(Character.toString(_char.toChar()), 36)
+            val value = Integer.parseInt(_char.toChar().toString(), 36)
             val factor = if (value < 10) 10 else 100
             (factor * previousMod + value) % 97
         } == 1
