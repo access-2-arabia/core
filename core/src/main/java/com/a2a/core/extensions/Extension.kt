@@ -254,6 +254,7 @@ fun View.enable(isEnable: Boolean) {
     isEnabled = isEnable
 }
 
+
 fun String.copyText(context: Context, successMessage: String) {
     val myClipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val myClip: ClipData = ClipData.newPlainText("Label", this)
