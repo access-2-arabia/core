@@ -8,21 +8,28 @@ import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
+import android.widget.*
+import androidx.annotation.StyleRes
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.SearchView
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.a2a.core.constants.DateTime
+import com.a2a.core.constants.DefaultValues.DEBOUNCE_SEARCH_DELAY
 import com.a2a.core.constants.DefaultValues.DEFAULT_INT
 import com.a2a.core.constants.StringCharacters.EMPTY_STRING
+import com.a2a.core.ui.date.DateTimeDialog
+import com.a2a.core.ui.date.DateTimeLimitation
+import com.a2a.core.ui.date.DialogType
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-
-const val DEBOUNCE_SEARCH_DELAY = 500L
+import java.text.SimpleDateFormat
+import java.util.*
 
 inline fun SearchView.doOnDebounceQueryChange(
     lifecycleOwner: LifecycleOwner,
@@ -132,4 +139,50 @@ fun measureSpecFromDimension(dimension: Int, maxDimension: Int): Int {
         )
         else -> View.MeasureSpec.makeMeasureSpec(dimension, View.MeasureSpec.EXACTLY)
     }
+}
+
+fun View.gone() {
+    visibility = View.GONE
+}
+
+fun View.visible() {
+    visibility = View.VISIBLE
+}
+
+fun View.invisible() {
+    visibility = View.INVISIBLE
+}
+
+fun Fragment.getDrawable(id: Int) = AppCompatResources.getDrawable(requireContext(), id)
+
+fun AutoCompleteTextView.setListAsString(
+    list: List<String>,
+    listener: AdapterView.OnItemClickListener
+) {
+    setAdapter(ArrayAdapter(context, android.R.layout.simple_dropdown_item_1line, list))
+    onItemClickListener = listener
+}
+
+fun AppCompatEditText.showDateTimeDialog(
+    fragment: FragmentActivity,
+    type: DialogType,
+    @StyleRes style: Int = 0,
+    data: String = EMPTY_STRING,
+    dateLimit: DateTimeLimitation = DateTimeLimitation.NONE
+) {
+    if (data.isNotEmpty()) setText(data)
+    setOnClickListener {
+        DateTimeDialog(fragment, type, data, dateLimit, style = style) {
+            setTextFromCalender(it, type)
+        }
+    }
+}
+
+fun AppCompatEditText.setTextFromCalender(calendar: Calendar, type: DialogType) {
+    val format = when (type) {
+        DialogType.Date -> DateTime.FORMAT_DATE
+        DialogType.Time -> DateTime.FORMAT_TIME
+    }
+    val sdf = SimpleDateFormat(format, Locale.ENGLISH)
+    setText(sdf.format(calendar.time))
 }
