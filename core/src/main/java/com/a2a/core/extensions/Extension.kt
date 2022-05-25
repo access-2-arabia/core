@@ -225,6 +225,7 @@ fun showViews(vararg view: View) {
     }
 }
 
+
 fun hideViews(vararg view: View) {
     view.forEach {
         it.visible(false)
