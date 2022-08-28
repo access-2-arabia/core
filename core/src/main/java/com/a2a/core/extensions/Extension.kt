@@ -52,7 +52,7 @@ import kotlin.math.pow
 
 private lateinit var fusedLocationClient: FusedLocationProviderClient
 val locationEvent = MutableLiveData<LocationEvent>()
-var addresses: List<Address>? = null
+var addresses: List<Address>? = listOf()
 var geocoder: Geocoder? = null
 
 fun View.setSafeOnClickListener(onSafeClick: (View) -> Unit) {
@@ -488,7 +488,7 @@ fun Activity.getLocation() {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ), 200
-        );
+        )
         return
     }
     if (locationEnabled()) {
@@ -499,15 +499,18 @@ fun Activity.getLocation() {
                 geocoder = Geocoder(this)
                 try {
                     if (geocoder != null) {
-                        addresses =
-                            geocoder!!.getFromLocation(
-                                location.latitude,
-                                location.longitude,
-                                10
-                            )
-                        val address = (addresses as MutableList<Address>?)?.get(0)
-                        locationEvent.value =
-                            LocationEvent.GotIpAddress("${getIPAddress()}#${address?.countryCode}")
+                        if (addresses!!.isNotEmpty()) {
+                            addresses =
+                                geocoder!!.getFromLocation(
+                                    location.latitude,
+                                    location.longitude,
+                                    10
+                                )
+                            val address = (addresses as MutableList<Address>?)?.get(0)
+
+                            locationEvent.value =
+                                LocationEvent.GotIpAddress("${getIPAddress()}#${address?.countryCode}")
+                        }
                     } else {
                     }
                 } catch (e: IOException) {
