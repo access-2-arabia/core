@@ -52,7 +52,7 @@ import kotlin.math.pow
 
 private lateinit var fusedLocationClient: FusedLocationProviderClient
 val locationEvent = MutableLiveData<LocationEvent>()
-var addresses: List<Address>? = null
+var addresses: List<Address>? = arrayListOf()
 var geocoder: Geocoder? = null
 
 fun View.setSafeOnClickListener(onSafeClick: (View) -> Unit) {
