@@ -505,9 +505,14 @@ fun Activity.getLocation() {
                                 location.longitude,
                                 10
                             )
-                        val address = (addresses as MutableList<Address>?)?.get(0)
-                        locationEvent.value =
-                            LocationEvent.GotIpAddress("${getIPAddress()}#${address?.countryCode}")
+                        if (addresses.isNullOrEmpty().not()) {
+                            val address = (addresses as MutableList<Address>?)?.get(0)
+                            locationEvent.value =
+                                LocationEvent.GotIpAddress("${getIPAddress()}#${address?.countryCode}")
+                        } else {
+                            locationEvent.value = LocationEvent.GotIpAddress(" 10.0.2.16#JO")
+                        }
+
                     } else {
                     }
                 } catch (e: IOException) {
